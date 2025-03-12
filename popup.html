@@ -1,0 +1,359 @@
+<!-- popup.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Auto-Close Timer</title>
+    <style>
+      :root {
+        --primary-color: #4285f4;
+        --secondary-color: #ea4335;
+        --background-color: #ffffff;
+        --text-color: #202124;
+        --light-gray: #f8f9fa;
+        --border-radius: 8px;
+        --transition-speed: 0.3s;
+      }
+
+      body {
+        width: 300px;
+        font-family: "Google Sans", Arial, sans-serif;
+        padding: 16px;
+        margin: 0;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        overflow: hidden;
+      }
+
+      h1 {
+        font-size: 20px;
+        font-weight: 500;
+        margin-bottom: 16px;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(-10px);
+        animation: fadeInDown 0.5s forwards;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .form-group {
+        margin-bottom: 4px;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeInUp 0.5s forwards;
+      }
+
+      .form-group:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+
+      .form-group:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: var(--border-radius);
+        border: 1px solid #dadce0;
+        background-color: var(--light-gray);
+        font-family: inherit;
+        font-size: 14px;
+        transition: all var(--transition-speed);
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="%23666" d="M0 0h12L6 6z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+      }
+
+      select:focus,
+      input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+      }
+
+      .timer-inputs {
+        display: flex;
+        gap: 8px;
+      }
+
+      .input-group {
+        position: relative;
+        flex: 1;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: var(--border-radius);
+        border: 1px solid #dadce0;
+        background-color: var(--light-gray);
+        font-family: inherit;
+        font-size: 14px;
+        text-align: center;
+        transition: all var(--transition-speed);
+      }
+
+      .input-group span {
+        position: absolute;
+        bottom: -18px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 11px;
+        color: #5f6368;
+      }
+
+      button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 16px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all var(--transition-speed);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeInUp 0.5s 0.3s forwards;
+      }
+
+      button:hover {
+        background-color: #3367d6;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      #active-timer {
+        margin-top: 8px;
+        padding: 16px;
+        background-color: var(--light-gray);
+        border-radius: var(--border-radius);
+        text-align: center;
+        display: none;
+        animation: fadeIn 0.5s;
+      }
+
+      #countdown {
+        font-size: 28px;
+        font-weight: 500;
+        color: var(--primary-color);
+        display: block;
+        margin: 8px 0 12px;
+      }
+
+      #action-info {
+        font-size: 13px;
+        color: #5f6368;
+        margin-bottom: 16px;
+      }
+
+      #cancel-button {
+        background-color: var(--secondary-color);
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      #cancel-button:hover {
+        background-color: #d33426;
+      }
+
+      .circular-progress {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 12px;
+        position: relative;
+      }
+
+      .progress-ring {
+        transform: rotate(-90deg);
+        transform-origin: center;
+      }
+
+      .progress-ring-circle {
+        stroke: var(--primary-color);
+        stroke-linecap: round;
+        transition: stroke-dashoffset 0.5s;
+        fill: transparent;
+      }
+
+      .progress-ring-bg {
+        stroke: #e8eaed;
+        fill: transparent;
+      }
+
+      /* Animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .pulse {
+        animation: pulse 2s infinite ease-in-out;
+      }
+
+      .ripple {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ripple:after {
+        content: "";
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+        background-repeat: no-repeat;
+        background-position: 50%;
+        transform: scale(10, 10);
+        opacity: 0;
+        transition: transform 0.5s, opacity 1s;
+      }
+
+      .ripple:active:after {
+        transform: scale(0, 0);
+        opacity: 0.3;
+        transition: 0s;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Auto-Close Timer</h1>
+
+    <div class="container">
+      <div class="form-group">
+        <label for="action-type">Close:</label>
+        <select id="action-type">
+          <option value="tab">Current Tab</option>
+          <option value="window">Current Window</option>
+          <option value="browser">Quit Chrome</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Set Timer:</label>
+        <div class="timer-inputs">
+          <div class="input-group">
+            <input type="number" id="hours" min="0" placeholder="0" value="0" />
+            <span>Hours</span>
+          </div>
+          <div class="input-group">
+            <input
+              type="number"
+              id="minutes"
+              min="0"
+              max="59"
+              placeholder="0"
+              value="0"
+            />
+            <span>Minutes</span>
+          </div>
+          <div class="input-group">
+            <input
+              type="number"
+              id="seconds"
+              min="0"
+              max="59"
+              placeholder="0"
+              value="0"
+            />
+            <span>Seconds</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="start-timer" class="ripple">Start Timer</button>
+    </div>
+
+    <div id="active-timer">
+      <div class="circular-progress">
+        <svg class="progress-ring" width="80" height="80">
+          <circle
+            class="progress-ring-bg"
+            r="35"
+            cx="40"
+            cy="40"
+            stroke-width="5"
+          ></circle>
+          <circle
+            class="progress-ring-circle"
+            r="35"
+            cx="40"
+            cy="40"
+            stroke-width="5"
+            stroke-dasharray="220"
+            stroke-dashoffset="0"
+          ></circle>
+        </svg>
+      </div>
+      <span id="countdown" class="pulse">00:00:00</span>
+      <div id="action-info">Closing current tab</div>
+      <button id="cancel-button" class="ripple">Cancel Timer</button>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
