@@ -3,7 +3,7 @@
   "name": "Auto-Close Timer",
   "version": "1.0",
   "description": "Automatically close tabs, windows, or Chrome after a set time",
-  "permissions": ["tabs", "alarms", "storage"],
+  "permissions": ["activeTab", "alarms", "storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
